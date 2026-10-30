@@ -102,16 +102,24 @@ def test_github_oauth_token(scanner: SecretScanner) -> None:
 # ============================================================================
 
 def test_slack_token_detection(scanner: SecretScanner) -> None:
-    text = "Posting alert via REDACTED_SLACK_TOKEN webhook."
+    token = "xoxb-" + "123456789012" + "-" + "1234567890123" + "-" + "abcdefghijklmnopqrstuvwx"
+    text = f"Posting alert via {token} webhook."
     result = scanner.scan(text)
 
     assert result.has_secrets
     assert any(f.metadata["secret_type"] == SecretType.SLACK_TOKEN.value for f in result.findings)
-    assert "REDACTED_SLACK_TOKEN" not in result.sanitized_text
+    assert token not in result.sanitized_text
 
 
 def test_slack_webhook_url(scanner: SecretScanner) -> None:
-    url = "REDACTED_SLACK_WEBHOOK"
+    url = (
+        "https://hooks.slack.com/services/"
+        + "T00000000"
+        + "/"
+        + "B00000000"
+        + "/"
+        + "XXXXXXXXXXXXXXXXXXXXXXXX"
+    )
     text = f"Webhook endpoint: {url}"
     result = scanner.scan(text)
     assert result.has_secrets
